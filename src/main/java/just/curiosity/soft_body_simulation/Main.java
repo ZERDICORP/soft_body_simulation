@@ -48,18 +48,22 @@ public class Main {
     window = new Window(bufferedImage, keyboard, mouse);
 
     // Creating soft body.
-    final double softBodyWidth = 150;
-    final double softBodyHeight = 150;
+    final double softBodyWidth = 100;
+    final double softBodyHeight = 100;
     final SoftBody softBody = new SoftBody(
       width / 2d - softBodyWidth / 2, 0,
       (int) softBodyWidth, (int) softBodyHeight,
-      25);
+      15);
 
     final List<StaticBody> staticBodies = new ArrayList<>();
     createStaticBodies(staticBodies);
 
     softBodyProcessor = new SoftBodyProcessor(softBody, staticBodies);
     softBodyProcessor.onUpdate(Main::renderSoftBody);
+    softBodyProcessor.setOnIntersect((prev, intersects) -> {
+      drawOval(new Vector(prev.x(), prev.y()), 5, Color.BLUE);
+      drawOval(new Vector(intersects.x(), intersects.y()), 6, Color.GREEN);
+    });
   }
 
   private static void createStaticBodies(List<StaticBody> staticBodies) {
@@ -67,7 +71,7 @@ public class Main {
     final double platformWidth = 400;
     final double platformHeight = 50;
     final double platformLeftTopX = width / 2d - platformWidth / 2;
-    final double platformLeftTopY = height - platformHeight;
+    final double platformLeftTopY = height / 2d - platformHeight / 2;
 
     staticBodies.add(new StaticBody(List.of(
       new Vector(platformLeftTopX, platformLeftTopY),
@@ -95,6 +99,29 @@ public class Main {
     return Math.sqrt((diffX * diffX) + (diffY * diffY));
   }
 
+  private static void drawPixel(double x, double y, int RGB) {
+    final int iX = (int) x;
+    final int iY = (int) y;
+    if (inRange(iX, iY)) {
+      pixelBuffer[iY * width + iX] = RGB;
+    }
+  }
+
+  private static void drawOval(Vector v, int radius, Color color) {
+    final double doublePI = Math.PI * 2;
+    for (int i = 0; i < radius; i++) {
+      final double rays = 4 * (i + 1);
+      final double thetaStep = doublePI / rays;
+      for (int j = 0; j < rays; j++) {
+        final double theta = thetaStep * j;
+        final double x = v.x() + Math.cos(theta) * i;
+        final double y = v.y() + Math.sin(theta) * i;
+
+        drawPixel(x, y, color.getRGB());
+      }
+    }
+  }
+
   private static void drawLine(Vector v1, Vector v2, Color color) {
     final double dist = dist(v1, v2);
     final double xStep = (v2.x() - v1.x()) / dist;
@@ -102,23 +129,19 @@ public class Main {
 
     double x = v1.x();
     double y = v1.y();
-
     for (int i = 0; i < dist; i++, x += xStep, y += yStep) {
-      final int iX = (int) x;
-      final int iY = (int) y;
-      if (inRange(iX, iY)) {
-        pixelBuffer[iY * width + iX] = color.getRGB();
-      }
+      drawPixel(x, y, color.getRGB());
     }
   }
 
   private static void renderSoftBody(SoftBody softBody, List<StaticBody> staticBodies) {
     final List<Spring> springs = softBody.springs();
     springs.parallelStream()
-      .forEach(s -> drawLine(
-        s.first().location(),
-        s.second().location(),
-        Color.RED));
+      .forEach(s -> {
+        drawLine(s.first().location(), s.second().location(), Color.RED);
+        drawOval(s.first().location(), 4, Color.RED);
+        drawOval(s.second().location(), 4, Color.RED);
+      });
 
     staticBodies.parallelStream()
       .forEach(staticBody -> {

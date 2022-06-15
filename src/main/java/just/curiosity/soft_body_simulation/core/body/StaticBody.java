@@ -19,4 +19,8 @@ public class StaticBody {
   public List<Vector> points() {
     return points;
   }
+
+  public void addPoints(List<Vector> points) {
+    this.points.addAll(points);
+  }
 }

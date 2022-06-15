@@ -44,4 +44,22 @@ public class Vector {
     x *= n;
     y *= n;
   }
+
+  public void subtract(Vector v) {
+    x -= v.x;
+    y -= v.y;
+  }
+
+  public void update(Vector v) {
+    x = v.x;
+    y = v.y;
+  }
+
+  @Override
+  public String toString() {
+    return "Vector{" +
+      "x=" + x +
+      ", y=" + y +
+      '}';
+  }
 }
