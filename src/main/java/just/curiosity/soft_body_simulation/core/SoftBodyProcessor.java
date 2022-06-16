@@ -5,6 +5,7 @@ import java.util.function.BiConsumer;
 import just.curiosity.soft_body_simulation.core.body.SoftBody;
 import just.curiosity.soft_body_simulation.core.body.StaticBody;
 import just.curiosity.soft_body_simulation.core.constants.Const;
+import just.curiosity.soft_body_simulation.core.particle.Particle;
 import just.curiosity.soft_body_simulation.core.vector.Vector;
 
 /**
@@ -35,17 +36,12 @@ public class SoftBodyProcessor {
   public void update(double deltaTime) {
     softBody.particles().parallelStream()
       .forEach(particle -> {
-        final Vector location = particle.location();
-        final Vector velocity = particle.velocity();
-
         final Vector acceleration = new Vector(0, Const.ACCELERATION * deltaTime);
-        velocity.add(acceleration);
+        particle.velocity().add(acceleration);
 
-        final Vector locationOffset = velocity.copy();
-        locationOffset.multiply(0.5 * deltaTime);
-        location.add(locationOffset);
+        final Vector locationOffset = applyVelocity(particle, deltaTime);
 
-        detectCollisions(location, locationOffset);
+        detectCollisionsWithStaticBodies(particle, locationOffset, deltaTime);
       });
 
     if (onUpdate != null) {
@@ -53,32 +49,43 @@ public class SoftBodyProcessor {
     }
   }
 
-  private void detectCollisions(Vector location, Vector locationOffset) {
-    final Vector previousLocation = location.copy();
+  private void detectCollisionsWithStaticBodies(Particle particle, Vector locationOffset, double deltaTime) {
+    final Vector previousLocation = particle.location().copy();
     previousLocation.subtract(locationOffset);
 
     final List<Vector> staticBodyPoints = staticBodies.stream()
       .reduce((b1, b2) -> {
         b2.addPoints(b1.points());
-
         return b2;
       })
       .orElseThrow()
       .points();
 
     for (int i = 1; i < staticBodyPoints.size(); i++) {
-      final Vector intersection = findIntersection(previousLocation, location,
+      final Vector intersection = findIntersection(previousLocation, particle.location(),
         staticBodyPoints.get(i - 1), staticBodyPoints.get(i));
 
       if (intersection != null) {
-        location.update(intersection);
+        particle.location().update(intersection);
+
+        // Bouncing.
+        particle.velocity().multiply(-0.5);
+        applyVelocity(particle, deltaTime);
 
         if (onIntersect != null) {
           onIntersect.accept(previousLocation, intersection);
         }
+
         break;
       }
     }
+  }
+
+  private Vector applyVelocity(Particle particle, double deltaTime) {
+    final Vector offset = particle.velocity().copy();
+    offset.multiply(0.5 * deltaTime);
+    particle.location().add(offset);
+    return offset;
   }
 
   private double determinant(Vector v1, Vector v2, Vector v3) {

@@ -48,22 +48,22 @@ public class Main {
     window = new Window(bufferedImage, keyboard, mouse);
 
     // Creating soft body.
-    final double softBodyWidth = 100;
-    final double softBodyHeight = 100;
+    final double softBodyWidth = 200;
+    final double softBodyHeight = 200;
     final SoftBody softBody = new SoftBody(
       width / 2d - softBodyWidth / 2, 0,
       (int) softBodyWidth, (int) softBodyHeight,
-      15);
+      10);
 
     final List<StaticBody> staticBodies = new ArrayList<>();
     createStaticBodies(staticBodies);
 
     softBodyProcessor = new SoftBodyProcessor(softBody, staticBodies);
     softBodyProcessor.onUpdate(Main::renderSoftBody);
-    softBodyProcessor.onIntersect((prev, intersects) -> {
-      drawOval(new Vector(prev.x(), prev.y()), 5, Color.BLUE);
-      drawOval(new Vector(intersects.x(), intersects.y()), 6, Color.GREEN);
-    });
+//    softBodyProcessor.onIntersect((prev, intersects) -> {
+//      drawOval(new Vector(prev.x(), prev.y()), 6, Color.BLUE);
+//      drawOval(new Vector(intersects.x(), intersects.y()), 6, Color.GREEN);
+//    });
   }
 
   private static void createStaticBodies(List<StaticBody> staticBodies) {
@@ -93,7 +93,7 @@ public class Main {
     return (x >= 0 && x < width) && (y >= 0 && y < height);
   }
 
-  private static double dist(Vector v1, Vector v2) {
+  public static double dist(Vector v1, Vector v2) {
     final double diffX = v2.x() - v1.x();
     final double diffY = v2.y() - v1.y();
     return Math.sqrt((diffX * diffX) + (diffY * diffY));
@@ -139,8 +139,8 @@ public class Main {
     springs.parallelStream()
       .forEach(s -> {
         drawLine(s.first().location(), s.second().location(), Color.RED);
-        drawOval(s.first().location(), 4, Color.RED);
-        drawOval(s.second().location(), 4, Color.RED);
+        drawOval(s.first().location(), (int) Const.PARTICLE_RADIUS, Color.RED);
+        drawOval(s.second().location(), (int) Const.PARTICLE_RADIUS, Color.RED);
       });
 
     staticBodies.parallelStream()

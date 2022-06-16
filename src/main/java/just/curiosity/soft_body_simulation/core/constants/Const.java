@@ -9,4 +9,5 @@ package just.curiosity.soft_body_simulation.core.constants;
 public interface Const {
   int BACKGROUND_COLOR_RGB = 0x000000; // BLACK
   double ACCELERATION = 200;
+  double PARTICLE_RADIUS = 4;
 }

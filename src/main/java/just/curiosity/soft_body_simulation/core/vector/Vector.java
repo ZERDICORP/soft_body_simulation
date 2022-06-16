@@ -1,5 +1,7 @@
 package just.curiosity.soft_body_simulation.core.vector;
 
+import java.util.Objects;
+
 /**
  * @author zerdicorp
  * @project soft_body_simulation
@@ -55,11 +57,28 @@ public class Vector {
     y = v.y;
   }
 
+  public double theta() {
+    return Math.atan2(-y, -x);
+  }
+
   @Override
   public String toString() {
     return "Vector{" +
       "x=" + x +
       ", y=" + y +
       '}';
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Vector vector = (Vector) o;
+    return Double.compare(vector.x, x) == 0 && Double.compare(vector.y, y) == 0;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(x, y);
   }
 }

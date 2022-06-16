@@ -1,5 +1,6 @@
 package just.curiosity.soft_body_simulation.core.particle;
 
+import java.util.Objects;
 import just.curiosity.soft_body_simulation.core.vector.Vector;
 
 /**
@@ -26,5 +27,18 @@ public class Particle {
 
   public Vector velocity() {
     return velocity;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Particle particle = (Particle) o;
+    return Objects.equals(location, particle.location) && Objects.equals(velocity, particle.velocity);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(location, velocity);
   }
 }
