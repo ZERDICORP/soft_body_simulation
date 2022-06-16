@@ -60,7 +60,7 @@ public class Main {
 
     softBodyProcessor = new SoftBodyProcessor(softBody, staticBodies);
     softBodyProcessor.onUpdate(Main::renderSoftBody);
-    softBodyProcessor.setOnIntersect((prev, intersects) -> {
+    softBodyProcessor.onIntersect((prev, intersects) -> {
       drawOval(new Vector(prev.x(), prev.y()), 5, Color.BLUE);
       drawOval(new Vector(intersects.x(), intersects.y()), 6, Color.GREEN);
     });

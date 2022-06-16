@@ -28,7 +28,7 @@ public class SoftBodyProcessor {
     this.onUpdate = onUpdate;
   }
 
-  public void setOnIntersect(BiConsumer<Vector, Vector> onIntersect) {
+  public void onIntersect(BiConsumer<Vector, Vector> onIntersect) {
     this.onIntersect = onIntersect;
   }
 
