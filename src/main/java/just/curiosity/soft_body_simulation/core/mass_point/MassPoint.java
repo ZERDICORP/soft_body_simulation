@@ -1,4 +1,4 @@
-package just.curiosity.soft_body_simulation.core.particle;
+package just.curiosity.soft_body_simulation.core.mass_point;
 
 import java.util.Objects;
 import just.curiosity.soft_body_simulation.core.vector.Vector;
@@ -9,15 +9,17 @@ import just.curiosity.soft_body_simulation.core.vector.Vector;
  * @created 14/06/2022 - 8:44 AM
  */
 
-public class Particle {
+public class MassPoint {
   private final Vector location;
   private final Vector velocity;
+  private final Vector force;
 
   {
     velocity = new Vector(0, 0);
+    force = new Vector(0, 0);
   }
 
-  public Particle(Vector location) {
+  public MassPoint(Vector location) {
     this.location = location;
   }
 
@@ -29,11 +31,15 @@ public class Particle {
     return velocity;
   }
 
+  public Vector force() {
+    return force;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    Particle particle = (Particle) o;
+    MassPoint particle = (MassPoint) o;
     return Objects.equals(location, particle.location) && Objects.equals(velocity, particle.velocity);
   }
 

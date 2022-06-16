@@ -1,6 +1,6 @@
 package just.curiosity.soft_body_simulation.core.spring;
 
-import just.curiosity.soft_body_simulation.core.particle.Particle;
+import just.curiosity.soft_body_simulation.core.mass_point.MassPoint;
 
 /**
  * @author zerdicorp
@@ -9,19 +9,19 @@ import just.curiosity.soft_body_simulation.core.particle.Particle;
  */
 
 public class Spring {
-  private final Particle first;
-  private final Particle second;
+  private final MassPoint first;
+  private final MassPoint second;
 
-  public Spring(Particle first, Particle second) {
+  public Spring(MassPoint first, MassPoint second) {
     this.first = first;
     this.second = second;
   }
 
-  public Particle first() {
+  public MassPoint first() {
     return first;
   }
 
-  public Particle second() {
+  public MassPoint second() {
     return second;
   }
 }

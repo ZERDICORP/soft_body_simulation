@@ -8,6 +8,9 @@ package just.curiosity.soft_body_simulation.core.constants;
 
 public interface Const {
   int BACKGROUND_COLOR_RGB = 0x000000; // BLACK
-  double ACCELERATION = 200;
+  double GRAVITY = 200;
   double PARTICLE_RADIUS = 4;
+  double POINT_MASS = 1;
+  double SPRING_STIFFNESS = 700;
+  double DAMPING_FACTOR = 0.7;
 }

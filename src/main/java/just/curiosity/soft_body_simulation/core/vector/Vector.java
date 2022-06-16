@@ -52,6 +52,11 @@ public class Vector {
     y -= v.y;
   }
 
+  public void divide(double n) {
+    x /= n;
+    y /= n;
+  }
+
   public void update(Vector v) {
     x = v.x;
     y = v.y;
@@ -59,6 +64,22 @@ public class Vector {
 
   public double theta() {
     return Math.atan2(-y, -x);
+  }
+
+  public void normalize() {
+    double magnitude = magnitude();
+    if (magnitude > 0) {
+      x /= magnitude;
+      y /= magnitude;
+    }
+  }
+
+  public double magnitude() {
+    return Math.sqrt(x * x + y * y);
+  }
+
+  public double dotProduct(Vector v) {
+    return x * v.x() + y * v.y();
   }
 
   @Override

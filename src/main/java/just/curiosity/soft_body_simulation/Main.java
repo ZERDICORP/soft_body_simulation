@@ -48,12 +48,12 @@ public class Main {
     window = new Window(bufferedImage, keyboard, mouse);
 
     // Creating soft body.
-    final double softBodyWidth = 200;
-    final double softBodyHeight = 200;
+    final double softBodyWidth = 100;
+    final double softBodyHeight = 100;
     final SoftBody softBody = new SoftBody(
       width / 2d - softBodyWidth / 2, 0,
       (int) softBodyWidth, (int) softBodyHeight,
-      10);
+      25);
 
     final List<StaticBody> staticBodies = new ArrayList<>();
     createStaticBodies(staticBodies);
@@ -67,8 +67,8 @@ public class Main {
   }
 
   private static void createStaticBodies(List<StaticBody> staticBodies) {
-    // Creating base bottom platform.
-    final double platformWidth = 400;
+    // Creating platform.
+    final double platformWidth = 800;
     final double platformHeight = 50;
     final double platformLeftTopX = width / 2d - platformWidth / 2;
     final double platformLeftTopY = height / 2d - platformHeight / 2;
@@ -78,6 +78,17 @@ public class Main {
       new Vector(platformLeftTopX + platformWidth, platformLeftTopY),
       new Vector(platformLeftTopX + platformWidth, platformLeftTopY + platformHeight),
       new Vector(platformLeftTopX, platformLeftTopY + platformHeight))));
+
+//    // Creating tilt platform.
+//    final double xOffset = 600;
+//    final double tiltPlatformWidth = 50;
+//    final double tiltPlatformHeight = 150;
+//    final double tiltPlatformLeftTopX = tiltPlatformWidth * 2;
+//    final double tiltPlatformLeftTopY = tiltPlatformHeight * 2;
+//
+//    staticBodies.add(new StaticBody(List.of(
+//      new Vector(tiltPlatformLeftTopX, tiltPlatformLeftTopY),
+//      new Vector(tiltPlatformLeftTopX + xOffset + tiltPlatformWidth, tiltPlatformLeftTopY + tiltPlatformHeight))));
   }
 
   // This method is responsible for tracking interactions (keystrokes,

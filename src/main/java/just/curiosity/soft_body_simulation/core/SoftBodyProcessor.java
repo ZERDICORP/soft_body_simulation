@@ -1,11 +1,13 @@
 package just.curiosity.soft_body_simulation.core;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
+import just.curiosity.soft_body_simulation.Main;
 import just.curiosity.soft_body_simulation.core.body.SoftBody;
 import just.curiosity.soft_body_simulation.core.body.StaticBody;
 import just.curiosity.soft_body_simulation.core.constants.Const;
-import just.curiosity.soft_body_simulation.core.particle.Particle;
+import just.curiosity.soft_body_simulation.core.mass_point.MassPoint;
 import just.curiosity.soft_body_simulation.core.vector.Vector;
 
 /**
@@ -34,14 +36,67 @@ public class SoftBodyProcessor {
   }
 
   public void update(double deltaTime) {
-    softBody.particles().parallelStream()
-      .forEach(particle -> {
-        final Vector acceleration = new Vector(0, Const.ACCELERATION * deltaTime);
-        particle.velocity().add(acceleration);
+    // Apply gravity force for each point.
+    softBody.massPoints().parallelStream()
+      .forEach(massPoint -> {
+        final Vector gravity = new Vector(0, Const.GRAVITY);
+        gravity.multiply(Const.POINT_MASS);
 
-        final Vector locationOffset = applyVelocity(particle, deltaTime);
+        massPoint.force().add(gravity);
+      });
 
-        detectCollisionsWithStaticBodies(particle, locationOffset, deltaTime);
+    // Apply spring force for each point.
+    softBody.springs().parallelStream()
+      .forEach(spring -> {
+        final double dist = Main.dist(spring.first().location(), spring.second().location());
+        final double force1 = (dist - softBody.restLength()) * Const.SPRING_STIFFNESS;
+
+        final Vector difference1 = spring.second().location().copy();
+        difference1.subtract(spring.first().location());
+        difference1.normalize();
+
+        final Vector direction = spring.second().velocity().copy();
+        direction.subtract(spring.first().velocity());
+
+        final double dotProduct = difference1.dotProduct(direction);
+
+        final double force2 = dotProduct * Const.DAMPING_FACTOR;
+        final double force3 = force1 + force2;
+
+        // Move first mass point.
+        difference1.multiply(force3);
+
+        spring.first().force().add(difference1);
+
+        // Move second mass point.
+        final Vector difference2 = spring.first().location().copy();
+        difference2.subtract(spring.second().location());
+        difference2.normalize();
+        difference2.multiply(force3);
+
+        spring.second().force().add(difference2);
+      });
+
+    // Apply final force for each point.
+    softBody.massPoints().parallelStream()
+      .forEach(massPoint -> {
+        massPoint.force().multiply(deltaTime);
+        massPoint.force().divide(Const.POINT_MASS);
+
+        massPoint.velocity().add(massPoint.force());
+
+        applyVelocity(massPoint, deltaTime);
+
+        massPoint.force().multiply(0);
+      });
+
+    // Apply collision reflect force for each point.
+    softBody.massPoints().parallelStream()
+      .forEach(massPoint -> {
+        final Vector offset = massPoint.velocity().copy();
+        offset.multiply(0.5 * deltaTime);
+
+        detectCollisionsWithStaticBodies(massPoint, offset);
       });
 
     if (onUpdate != null) {
@@ -49,28 +104,34 @@ public class SoftBodyProcessor {
     }
   }
 
-  private void detectCollisionsWithStaticBodies(Particle particle, Vector locationOffset, double deltaTime) {
-    final Vector previousLocation = particle.location().copy();
+  private void applyVelocity(MassPoint massPoint, double deltaTime) {
+    final Vector offset = massPoint.velocity().copy();
+    offset.multiply(0.5 * deltaTime);
+    massPoint.location().add(offset);
+  }
+
+  private void detectCollisionsWithStaticBodies(MassPoint massPoint, Vector locationOffset) {
+    if (staticBodies.size() == 0) {
+      return;
+    }
+
+    final Vector previousLocation = massPoint.location().copy();
     previousLocation.subtract(locationOffset);
 
-    final List<Vector> staticBodyPoints = staticBodies.stream()
-      .reduce((b1, b2) -> {
-        b2.addPoints(b1.points());
-        return b2;
-      })
-      .orElseThrow()
-      .points();
+    final List<Vector> staticBodyPoints = new ArrayList<>();
+    for (StaticBody staticBody : staticBodies) {
+      staticBodyPoints.addAll(staticBody.points());
+    }
 
+    // TODO: implement Ray Casting algorithm for each mass point
     for (int i = 1; i < staticBodyPoints.size(); i++) {
-      final Vector intersection = findIntersection(previousLocation, particle.location(),
+      final Vector intersection = findIntersection(previousLocation, massPoint.location(),
         staticBodyPoints.get(i - 1), staticBodyPoints.get(i));
 
       if (intersection != null) {
-        particle.location().update(intersection);
+        massPoint.location().update(intersection);
 
-        // Bouncing.
-        particle.velocity().multiply(-0.5);
-        applyVelocity(particle, deltaTime);
+        // TODO: velocity vector reflection
 
         if (onIntersect != null) {
           onIntersect.accept(previousLocation, intersection);
@@ -79,13 +140,6 @@ public class SoftBodyProcessor {
         break;
       }
     }
-  }
-
-  private Vector applyVelocity(Particle particle, double deltaTime) {
-    final Vector offset = particle.velocity().copy();
-    offset.multiply(0.5 * deltaTime);
-    particle.location().add(offset);
-    return offset;
   }
 
   private double determinant(Vector v1, Vector v2, Vector v3) {
