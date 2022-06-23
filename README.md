@@ -40,7 +40,7 @@ Here is the basic set of properties for each **particle**:
 - **velocity**
 
 I mean, it's pretty primitive.  
-We have an element location **(x, y)** and a **velocity vector**.  
+We have a particle location **(x, y)** and a **velocity vector**.  
 It remains for each frame to update the location, adding velocity to it.  
 
 _It's all? Do we have a soft body?_
