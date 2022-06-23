@@ -62,7 +62,7 @@ Our task is to **split the particles into pairs**. Each pair forms a **spring**.
 Next, we need to go through all the **springs** (_pairs of two particles_) and, based on some data, calculate the **next position of the particles** in space.  
 
 Thus, the **particles become bound to each other**.  
-And the **system of spring masses** allows you to achieve the effect of **jelly**, since when the particles move away from each other, they are forced to move towards each other (**spring compression**), otherwise, if the particles are too close to each other (closer than a certain distance / state of rest), they forced to move in opposite directions (**stretching the spring**).  
+And the **system of spring masses** allows you to achieve the effect of **jelly**, since when the particles move away from each other, they are forced to move towards each other (**spring compression**), otherwise, if the particles are too close to each other (closer than a certain distance / **state of rest**), they forced to move in opposite directions (**stretching the spring**).  
 
 Summarizing the above, we have:
 - **Particles**
@@ -72,9 +72,9 @@ This is actually enough to create a **soft body**.
 
 #### #4 ~ «Soft body»
 Well, let's briefly go through the main steps:
-1. Create particles.
-2. Connect them with springs.
-3. Iterate through the springs every frame and apply all sorts of tricky formulas (at the end of the README you can find links) to achieve the spring effect (press the particles - they return to each other; bring the particles closer - they push each other with all their might; stretch the spring and release it - it will contract and stretch, making **harmonic oscillations**, until it reaches a **state of rest**).
+1. Create **particles**.
+2. Connect them with **springs**.
+3. Iterate through the springs every frame and apply all **sorts of tricky formulas** to achieve the spring effect (move away the particles - they return to each other; bring the particles closer - they push each other with all their might; stretch the spring and release it - it will contract and stretch, making **harmonic oscillations**, until it reaches a **state of rest**).
 
 Apart from the **spring mass system**, you will probably need a **gravity simulation** (just add a constant to the y-axis of the velocity vector every frame), a **collision resolution algorithm** (because you don't want your soft body to fall forever) and **a lot of curiosity** (no way without it)!  
 
