@@ -1,4 +1,4 @@
-package just.curiosity.soft_body_simulation.core.mass_point;
+package just.curiosity.soft_body_simulation.core.particle;
 
 import java.util.Objects;
 import just.curiosity.soft_body_simulation.core.vector.Vector;
@@ -9,7 +9,9 @@ import just.curiosity.soft_body_simulation.core.vector.Vector;
  * @created 14/06/2022 - 8:44 AM
  */
 
-public class MassPoint {
+public class Particle {
+  public static int staticGlobalId;
+  public final int id;
   private final Vector location;
   private final Vector velocity;
   private final Vector force;
@@ -17,9 +19,14 @@ public class MassPoint {
   {
     velocity = new Vector(0, 0);
     force = new Vector(0, 0);
+
+    // Each particle needs an identifier so that when calculating
+    // the collision, we do not check if the particle collides
+    // with itself.
+    id = ++staticGlobalId;
   }
 
-  public MassPoint(Vector location) {
+  public Particle(Vector location) {
     this.location = location;
   }
 
@@ -37,14 +44,19 @@ public class MassPoint {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    MassPoint particle = (MassPoint) o;
-    return Objects.equals(location, particle.location) && Objects.equals(velocity, particle.velocity);
+    if (this == o) {
+      return true;
+    }
+
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    return ((Particle) o).id == id;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(location, velocity);
+    return Objects.hash(id);
   }
 }

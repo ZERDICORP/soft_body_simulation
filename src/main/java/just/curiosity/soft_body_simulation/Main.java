@@ -7,11 +7,10 @@ import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import just.curiosity.soft_body_simulation.core.SoftBody;
 import just.curiosity.soft_body_simulation.core.SoftBodyProcessor;
-import just.curiosity.soft_body_simulation.core.body.SoftBody;
-import just.curiosity.soft_body_simulation.core.body.StaticBody;
 import just.curiosity.soft_body_simulation.core.constants.Const;
-import just.curiosity.soft_body_simulation.core.spring.Spring;
+import just.curiosity.soft_body_simulation.core.line.Line;
 import just.curiosity.soft_body_simulation.core.vector.Vector;
 import just.curiosity.soft_body_simulation.gui.Window;
 import just.curiosity.soft_body_simulation.gui.interaction.Keyboard;
@@ -30,12 +29,14 @@ public class Main {
   private static final Mouse mouse;
   private static final int[] pixelBuffer;
   private static final Window window;
+  private static final SoftBody softBody;
   private static final SoftBodyProcessor softBodyProcessor;
+  private static final List<Line> boundaries;
   private static boolean isRunning;
 
   static {
-    width = 1000;
-    height = 700;
+    width = 1300;
+    height = 900;
     keyboard = new Keyboard();
     mouse = new Mouse();
     isRunning = true;
@@ -46,68 +47,53 @@ public class Main {
       .getData();
 
     window = new Window(bufferedImage, keyboard, mouse);
+    softBody = new SoftBody(100, -60, 180, 280, 40);
+    boundaries = new ArrayList<>();
+    softBodyProcessor = new SoftBodyProcessor(softBody, boundaries);
 
-    // Creating soft body.
-    final double softBodyWidth = 100;
-    final double softBodyHeight = 100;
-    final SoftBody softBody = new SoftBody(
-      width / 2d - softBodyWidth / 2, 0,
-      (int) softBodyWidth, (int) softBodyHeight,
-      25);
-
-    final List<StaticBody> staticBodies = new ArrayList<>();
-    createStaticBodies(staticBodies);
-
-    softBodyProcessor = new SoftBodyProcessor(softBody, staticBodies);
-    softBodyProcessor.onUpdate(Main::renderSoftBody);
-//    softBodyProcessor.onIntersect((prev, intersects) -> {
-//      drawOval(new Vector(prev.x(), prev.y()), 6, Color.BLUE);
-//      drawOval(new Vector(intersects.x(), intersects.y()), 6, Color.GREEN);
-//    });
+    initBoundaries();
   }
 
-  private static void createStaticBodies(List<StaticBody> staticBodies) {
-    // Creating platform.
-    final double platformWidth = 800;
-    final double platformHeight = 50;
-    final double platformLeftTopX = width / 2d - platformWidth / 2;
-    final double platformLeftTopY = height / 2d - platformHeight / 2;
+  private static void initBoundaries() {
+    boundaries.add(new Line(
+      new Vector(0, 280),
+      new Vector(140, 280)));
 
-    staticBodies.add(new StaticBody(List.of(
-      new Vector(platformLeftTopX, platformLeftTopY),
-      new Vector(platformLeftTopX + platformWidth, platformLeftTopY),
-      new Vector(platformLeftTopX + platformWidth, platformLeftTopY + platformHeight),
-      new Vector(platformLeftTopX, platformLeftTopY + platformHeight))));
+    boundaries.add(new Line(
+      new Vector(140, 280),
+      new Vector(300, 450)));
 
-//    // Creating tilt platform.
-//    final double xOffset = 600;
-//    final double tiltPlatformWidth = 50;
-//    final double tiltPlatformHeight = 150;
-//    final double tiltPlatformLeftTopX = tiltPlatformWidth * 2;
-//    final double tiltPlatformLeftTopY = tiltPlatformHeight * 2;
-//
-//    staticBodies.add(new StaticBody(List.of(
-//      new Vector(tiltPlatformLeftTopX, tiltPlatformLeftTopY),
-//      new Vector(tiltPlatformLeftTopX + xOffset + tiltPlatformWidth, tiltPlatformLeftTopY + tiltPlatformHeight))));
-  }
+    boundaries.add(new Line(
+      new Vector(300, 450),
+      new Vector(400, 450)));
 
-  // This method is responsible for tracking interactions (keystrokes,
-  // mouse click/movement).
-  private static void interactionControl() {
-    // Pressing escape will stop the application.
-    if (keyboard.getCurrentKeyCode() == KeyEvent.VK_ESCAPE) {
-      stop();
-    }
+    boundaries.add(new Line(
+      new Vector(400, 450),
+      new Vector(500, 550)));
+
+    boundaries.add(new Line(
+      new Vector(500, 550),
+      new Vector(600, 550)));
+
+    boundaries.add(new Line(
+      new Vector(600, 550),
+      new Vector(700, 700)));
+
+    boundaries.add(new Line(
+      new Vector(700, 700),
+      new Vector(900, 850)));
+
+    boundaries.add(new Line(
+      new Vector(900, 850),
+      new Vector(1200, 850)));
+
+    boundaries.add(new Line(
+      new Vector(1200, 850),
+      new Vector(width + Const.MASS_POINT_RADIUS, 500)));
   }
 
   private static boolean inRange(double x, double y) {
     return (x >= 0 && x < width) && (y >= 0 && y < height);
-  }
-
-  public static double dist(Vector v1, Vector v2) {
-    final double diffX = v2.x() - v1.x();
-    final double diffY = v2.y() - v1.y();
-    return Math.sqrt((diffX * diffX) + (diffY * diffY));
   }
 
   private static void drawPixel(double x, double y, int RGB) {
@@ -119,10 +105,9 @@ public class Main {
   }
 
   private static void drawOval(Vector v, int radius, Color color) {
-    final double doublePI = Math.PI * 2;
     for (int i = 0; i < radius; i++) {
       final double rays = 4 * (i + 1);
-      final double thetaStep = doublePI / rays;
+      final double thetaStep = Const.DOUBLE_PI / rays;
       for (int j = 0; j < rays; j++) {
         final double theta = thetaStep * j;
         final double x = v.x() + Math.cos(theta) * i;
@@ -133,37 +118,37 @@ public class Main {
     }
   }
 
-  private static void drawLine(Vector v1, Vector v2, Color color) {
-    final double dist = dist(v1, v2);
-    final double xStep = (v2.x() - v1.x()) / dist;
-    final double yStep = (v2.y() - v1.y()) / dist;
+  private static void drawLine(Vector start, Vector end, Color color) {
+    final double dist = start.distTo(end);
+    final Vector unit = end.copy()
+      .subtract(start)
+      .divide(dist);
 
-    double x = v1.x();
-    double y = v1.y();
-    for (int i = 0; i < dist; i++, x += xStep, y += yStep) {
-      drawPixel(x, y, color.getRGB());
+    final double theta = unit.theta();
+    for (int j = 0; j < Const.MASS_POINT_RADIUS; j++) {
+      final double cos = Math.cos(theta) * j;
+      final double sin = Math.sin(theta) * j;
+
+      double x = start.x();
+      double y = start.y();
+      for (int i = 0; i < dist; i++, x += unit.x(), y += unit.y()) {
+        drawPixel(x, y, color.getRGB());
+
+        drawPixel(x + sin, y - cos, color.getRGB());
+        drawPixel(x - sin, y + cos, color.getRGB());
+
+        if (i == 0 || i == dist - 1) {
+          drawOval(new Vector(x, y), (int) Const.MASS_POINT_RADIUS, Color.WHITE);
+        }
+      }
     }
   }
 
-  private static void renderSoftBody(SoftBody softBody, List<StaticBody> staticBodies) {
-    final List<Spring> springs = softBody.springs();
-    springs.parallelStream()
-      .forEach(s -> {
-        drawLine(s.first().location(), s.second().location(), Color.RED);
-        drawOval(s.first().location(), (int) Const.PARTICLE_RADIUS, Color.RED);
-        drawOval(s.second().location(), (int) Const.PARTICLE_RADIUS, Color.RED);
-      });
-
-    staticBodies.parallelStream()
-      .forEach(staticBody -> {
-        final List<Vector> points = staticBody.points();
-        for (int i = 1; i < points.size(); i++) {
-          drawLine(points.get(i - 1), points.get(i), Color.WHITE);
-          if (i == points.size() - 1) {
-            drawLine(points.get(i), points.get(0), Color.WHITE);
-          }
-        }
-      });
+  private static void interactionControl() {
+    // Pressing escape will stop the application.
+    if (keyboard.getCurrentKeyCode() == KeyEvent.VK_ESCAPE) {
+      stop();
+    }
   }
 
   // This method is called on every frame.
@@ -174,6 +159,18 @@ public class Main {
 
     softBodyProcessor.update(deltaTime);
 
+    // Drawing points, or rather connect them with lines.
+    softBody.springs().parallelStream()
+      .forEach(spring -> {
+        drawLine(spring.second().location(), spring.first().location(), Const.SOFT_BODY_COLOR);
+        drawOval(spring.second().location(), (int) Const.MASS_POINT_RADIUS, Const.SOFT_BODY_COLOR);
+        drawOval(spring.first().location(), (int) Const.MASS_POINT_RADIUS, Const.SOFT_BODY_COLOR);
+      });
+
+    // Border drawing.
+    boundaries.parallelStream()
+      .forEach(border -> drawLine(border.start(), border.end(), Color.WHITE));
+
     window.draw();
   }
 
@@ -181,17 +178,9 @@ public class Main {
   public static void start() {
     int frames = 0;
     long start = System.currentTimeMillis();
-    long time0 = System.nanoTime();
-    double time;
-    double lastTime = 0;
-    double deltaTime;
 
     while (isRunning) {
-      time = (System.nanoTime() - time0) / 1E9;
-      deltaTime = time - lastTime;
-      lastTime = time;
-
-      updateAndDraw(deltaTime);
+      updateAndDraw(Const.DELTA_TIME_MOCK);
 
       // Timing for FPS display.
       long end = System.currentTimeMillis();

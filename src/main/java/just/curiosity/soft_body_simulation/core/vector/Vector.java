@@ -1,7 +1,5 @@
 package just.curiosity.soft_body_simulation.core.vector;
 
-import java.util.Objects;
-
 /**
  * @author zerdicorp
  * @project soft_body_simulation
@@ -17,6 +15,10 @@ public class Vector {
     this.y = y;
   }
 
+  public Vector copy() {
+    return new Vector(x, y);
+  }
+
   public double x() {
     return x;
   }
@@ -25,53 +27,59 @@ public class Vector {
     return y;
   }
 
-  public void setX(double x) {
-    this.x = x;
-  }
-
-  public void setY(double y) {
-    this.y = y;
-  }
-
-  public void add(Vector v) {
-    x += v.x;
-    y += v.y;
-  }
-
-  public Vector copy() {
-    return new Vector(x, y);
-  }
-
-  public void multiply(double n) {
-    x *= n;
-    y *= n;
-  }
-
-  public void subtract(Vector v) {
-    x -= v.x;
-    y -= v.y;
-  }
-
-  public void divide(double n) {
-    x /= n;
-    y /= n;
-  }
-
-  public void update(Vector v) {
+  public Vector update(Vector v) {
     x = v.x;
     y = v.y;
+    return this;
   }
 
-  public double theta() {
-    return Math.atan2(-y, -x);
+  public Vector add(Vector v) {
+    x += v.x;
+    y += v.y;
+    return this;
   }
 
-  public void normalize() {
+  public Vector subtract(Vector v) {
+    x -= v.x;
+    y -= v.y;
+    return this;
+  }
+
+  public Vector multiply(Vector v) {
+    x *= v.x();
+    y *= v.y();
+    return this;
+  }
+
+  public Vector divide(double n) {
+    x /= n;
+    y /= n;
+    return this;
+  }
+
+  public Vector multiply(double n) {
+    x *= n;
+    y *= n;
+    return this;
+  }
+
+  public Vector addX(double n) {
+    x += n;
+    return this;
+  }
+
+  public Vector addY(double n) {
+    y += n;
+    return this;
+  }
+
+  public Vector normalize() {
     double magnitude = magnitude();
     if (magnitude > 0) {
       x /= magnitude;
       y /= magnitude;
     }
+    return this;
   }
 
   public double magnitude() {
@@ -82,24 +90,21 @@ public class Vector {
     return x * v.x() + y * v.y();
   }
 
+  public double theta() {
+    return Math.atan2(-y, -x);
+  }
+
+  public double distTo(Vector v) {
+    final double diffX = v.x() - x;
+    final double diffY = v.y() - y;
+    return Math.sqrt((diffX * diffX) + (diffY * diffY));
+  }
+
   @Override
   public String toString() {
     return "Vector{" +
       "x=" + x +
       ", y=" + y +
       '}';
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    Vector vector = (Vector) o;
-    return Double.compare(vector.x, x) == 0 && Double.compare(vector.y, y) == 0;
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(x, y);
   }
 }
