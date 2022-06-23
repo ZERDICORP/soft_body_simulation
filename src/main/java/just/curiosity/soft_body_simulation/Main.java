@@ -9,8 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import just.curiosity.soft_body_simulation.core.SoftBody;
 import just.curiosity.soft_body_simulation.core.SoftBodyProcessor;
+import just.curiosity.soft_body_simulation.core.boundary.Boundary;
 import just.curiosity.soft_body_simulation.core.constants.Const;
-import just.curiosity.soft_body_simulation.core.line.Line;
 import just.curiosity.soft_body_simulation.core.vector.Vector;
 import just.curiosity.soft_body_simulation.gui.Window;
 import just.curiosity.soft_body_simulation.gui.interaction.Keyboard;
@@ -31,7 +31,7 @@ public class Main {
   private static final Window window;
   private static final SoftBody softBody;
   private static final SoftBodyProcessor softBodyProcessor;
-  private static final List<Line> boundaries;
+  private static final List<Boundary> boundaries;
   private static boolean isRunning;
 
   static {
@@ -55,39 +55,39 @@ public class Main {
   }
 
   private static void initBoundaries() {
-    boundaries.add(new Line(
+    boundaries.add(new Boundary(
       new Vector(0, 280),
       new Vector(140, 280)));
 
-    boundaries.add(new Line(
+    boundaries.add(new Boundary(
       new Vector(140, 280),
       new Vector(300, 450)));
 
-    boundaries.add(new Line(
+    boundaries.add(new Boundary(
       new Vector(300, 450),
       new Vector(400, 450)));
 
-    boundaries.add(new Line(
+    boundaries.add(new Boundary(
       new Vector(400, 450),
       new Vector(500, 550)));
 
-    boundaries.add(new Line(
+    boundaries.add(new Boundary(
       new Vector(500, 550),
       new Vector(600, 550)));
 
-    boundaries.add(new Line(
+    boundaries.add(new Boundary(
       new Vector(600, 550),
       new Vector(700, 700)));
 
-    boundaries.add(new Line(
+    boundaries.add(new Boundary(
       new Vector(700, 700),
       new Vector(900, 850)));
 
-    boundaries.add(new Line(
+    boundaries.add(new Boundary(
       new Vector(900, 850),
       new Vector(1200, 850)));
 
-    boundaries.add(new Line(
+    boundaries.add(new Boundary(
       new Vector(1200, 850),
       new Vector(width + Const.MASS_POINT_RADIUS, 500)));
   }
@@ -157,6 +157,7 @@ public class Main {
 
     Arrays.fill(pixelBuffer, Const.BACKGROUND_COLOR_RGB);
 
+    // Update soft body state.
     softBodyProcessor.update(deltaTime);
 
     // Drawing points, or rather connect them with lines.
@@ -167,9 +168,9 @@ public class Main {
         drawOval(spring.first().location(), (int) Const.MASS_POINT_RADIUS, Const.SOFT_BODY_COLOR);
       });
 
-    // Border drawing.
+    // Drawing boundaries.
     boundaries.parallelStream()
-      .forEach(border -> drawLine(border.start(), border.end(), Color.WHITE));
+      .forEach(boundary -> drawLine(boundary.start(), boundary.end(), Color.WHITE));
 
     window.draw();
   }

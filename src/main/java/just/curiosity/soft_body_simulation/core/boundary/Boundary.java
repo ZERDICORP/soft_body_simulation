@@ -1,4 +1,4 @@
-package just.curiosity.soft_body_simulation.core.line;
+package just.curiosity.soft_body_simulation.core.boundary;
 
 import just.curiosity.soft_body_simulation.core.vector.Vector;
 
@@ -8,5 +8,5 @@ import just.curiosity.soft_body_simulation.core.vector.Vector;
  * @created 22/06/2022 - 6:05 PM
  */
 
-public record Line(Vector start, Vector end) {
+public record Boundary(Vector start, Vector end) {
 }

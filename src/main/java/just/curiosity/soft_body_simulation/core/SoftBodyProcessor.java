@@ -1,8 +1,8 @@
 package just.curiosity.soft_body_simulation.core;
 
 import java.util.List;
+import just.curiosity.soft_body_simulation.core.boundary.Boundary;
 import just.curiosity.soft_body_simulation.core.constants.Const;
-import just.curiosity.soft_body_simulation.core.line.Line;
 import just.curiosity.soft_body_simulation.core.particle.Particle;
 import just.curiosity.soft_body_simulation.core.vector.Vector;
 
@@ -14,11 +14,11 @@ import just.curiosity.soft_body_simulation.core.vector.Vector;
 
 public class SoftBodyProcessor {
   private final SoftBody softBody;
-  private final List<Line> bounds;
+  private final List<Boundary> boundaries;
 
-  public SoftBodyProcessor(SoftBody softBody, List<Line> bounds) {
+  public SoftBodyProcessor(SoftBody softBody, List<Boundary> boundaries) {
     this.softBody = softBody;
-    this.bounds = bounds;
+    this.boundaries = boundaries;
   }
 
   public void update(double deltaTime) {
@@ -129,7 +129,7 @@ public class SoftBodyProcessor {
   }
 
   private void boundariesCollision(Particle particle, double deltaTime) {
-    if (bounds.size() == 0) {
+    if (boundaries.size() == 0) {
       return;
     }
 
@@ -144,8 +144,8 @@ public class SoftBodyProcessor {
       // For each boundary, it is necessary to find the intersection
       // with the ray. As a result, the nearest intersection will be
       // taken as the basis for calculations.
-      for (Line border : bounds) {
-        final Vector intersection = findIntersection(particle.location(), rayEnd, border.start(), border.end());
+      for (Boundary boundary : boundaries) {
+        final Vector intersection = findIntersection(particle.location(), rayEnd, boundary.start(), boundary.end());
         if (intersection == null) {
           continue;
         }
