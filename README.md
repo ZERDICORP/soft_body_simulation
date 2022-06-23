@@ -74,7 +74,7 @@ This is actually enough to create a **soft body**.
 Well, let's briefly go through the main steps:
 1. Create particles.
 2. Connect them with springs.
-3. Iterate through the springs every frame and apply all sorts of tricky formulas (at the end of the README you can find links) to achieve the spring effect (press the particles - they return to each other; bring the particles closer - they push each other with all their might; stretch the spring and release it - it will contract and stretch, making harmonic oscillations, until it reaches a state of rest).
+3. Iterate through the springs every frame and apply all sorts of tricky formulas (at the end of the README you can find links) to achieve the spring effect (press the particles - they return to each other; bring the particles closer - they push each other with all their might; stretch the spring and release it - it will contract and stretch, making **harmonic oscillations**, until it reaches a **state of rest**).
 
 Apart from the **spring mass system**, you will probably need a **gravity simulation** (just add a constant to the y-axis of the velocity vector every frame), a **collision resolution algorithm** (because you don't want your soft body to fall forever) and **a lot of curiosity** (no way without it)!  
 
