@@ -7,6 +7,7 @@ import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import just.curiosity.soft_body_simulation.core.SoftBody;
 import just.curiosity.soft_body_simulation.core.SoftBodyProcessor;
 import just.curiosity.soft_body_simulation.core.boundary.Boundary;
@@ -47,11 +48,15 @@ public class Main {
       .getData();
 
     window = new Window(bufferedImage, keyboard, mouse);
-    softBody = new SoftBody(100, -60, 280, 180, 40);
+    softBody = new SoftBody(100 + rand(-50, 50), -60, 280, 180, 40);
     boundaries = new ArrayList<>();
     softBodyProcessor = new SoftBodyProcessor(softBody, boundaries);
 
     initBoundaries();
+  }
+
+  private static int rand(int min, int max) {
+    return new Random().nextInt(max - min) + min;
   }
 
   private static void initBoundaries() {
