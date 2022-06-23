@@ -94,7 +94,7 @@ public class Main {
 
     boundaries.add(new Boundary(
       new Vector(1200, 850),
-      new Vector(width + Const.MASS_POINT_RADIUS, 500)));
+      new Vector(width + Const.MASS_POINT_RADIUS, 300)));
   }
 
   private static boolean inRange(double x, double y) {
