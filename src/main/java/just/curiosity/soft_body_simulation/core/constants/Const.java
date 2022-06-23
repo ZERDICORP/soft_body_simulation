@@ -14,7 +14,7 @@ public interface Const {
   double DOUBLE_PI = Math.PI * 2;
   double COLLISION_RAY_STEP = DOUBLE_PI / COLLISION_RAYS;
   double GRAVITY = 300;
-  double MASS_POINT_RADIUS = 10;
+  double MASS_POINT_RADIUS = 12;
   double POINT_MASS = 0.1;
   double SPRING_STIFFNESS = 250;
   double DAMPING_FACTOR = 0.65;
