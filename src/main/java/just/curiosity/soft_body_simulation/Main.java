@@ -47,7 +47,7 @@ public class Main {
       .getData();
 
     window = new Window(bufferedImage, keyboard, mouse);
-    softBody = new SoftBody(100, -60, 180, 280, 40);
+    softBody = new SoftBody(100, -60, 280, 180, 40);
     boundaries = new ArrayList<>();
     softBodyProcessor = new SoftBodyProcessor(softBody, boundaries);
 
