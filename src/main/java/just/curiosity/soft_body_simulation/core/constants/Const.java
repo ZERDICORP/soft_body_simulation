@@ -17,7 +17,7 @@ public interface Const {
   double MASS_POINT_RADIUS = 10;
   double POINT_MASS = 0.1;
   double SPRING_STIFFNESS = 250;
-  double DAMPING_FACTOR = 0.8;
+  double DAMPING_FACTOR = 0.65;
   double DELTA_TIME_MOCK = 0.01;
   Color SOFT_BODY_COLOR = new Color(114, 206, 0);
 }
