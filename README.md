@@ -21,7 +21,7 @@ I am driven only by wild curiosity, what are you talking about? :D_
 > _Whoever goes will come._  
 > _Those who google will not notice the answer in the first link._
 
-#### #1 ~ «Introduction»
+### #1 ~ «Introduction»
 Well, let's understand how **soft body simulation** works.  
 
 First, we need to understand **what the body itself** is. And by the way, it won't take long to find the answer (that's why I'm here lol):
@@ -32,7 +32,7 @@ It is from these little freaks that everything around us consists: the phone tha
 
 And, you know, if you want to create a **soft body**, you don't have to **beat around the bush** - **steal the idea from nature**!
 
-#### #2 ~ «Particles»
+### #2 ~ «Particles»
 _So, okay, we have particles. But what exactly are they?_
 
 Here is the basic set of properties for each **particle**:
@@ -47,7 +47,7 @@ _It's all? Do we have a soft body?_
 
 **Lol, no.. :D**
 
-#### #3 ~ «Springs»
+### #3 ~ «Springs»
 Having only **particles**, you can get, for example, a **gas**, but obviously not a **soft body**, because, as you know, a body is a body, because it is an **ordered set of interconnected particles** (_crystal lattice_).  
 
 And, if we were making a regular **rigid body**, we wouldn't even have to tie anything.  
@@ -70,7 +70,7 @@ Summarizing the above, we have:
 
 This is actually enough to create a **soft body**.  
 
-#### #4 ~ «Soft body»
+### #4 ~ «Soft body»
 Well, let's briefly go through the main steps:
 1. Create **particles**.
 2. Connect them with **springs**.
